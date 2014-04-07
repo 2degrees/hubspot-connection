@@ -3,8 +3,8 @@
 # Copyright (c) 2014, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of hubspot-contacts
-# <https://github.com/2degrees/hubspot-contacts>, which is subject to the
+# This file is part of hubspot-connection
+# <https://github.com/2degrees/hubspot-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -26,7 +26,7 @@ _VERSION = \
 
 
 setup(
-    name='hubspot-contacts',
+    name='hubspot-connection',
     version=_VERSION,
     description='',
     long_description=_README_CONTENTS,

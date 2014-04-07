@@ -3,8 +3,8 @@
 # Copyright (c) 2014, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of hubspot-contacts
-# <https://github.com/2degrees/hubspot-contacts>, which is subject to the
+# This file is part of hubspot-connection
+# <https://github.com/2degrees/hubspot-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -28,15 +28,15 @@ from nose.tools import ok_
 from requests.adapters import HTTPAdapter as RequestsHTTPAdapter
 from requests.models import Response as RequestsResponse
 
-from hubspot.contacts.connection import APIKey
-from hubspot.contacts.connection import OAuthKey
-from hubspot.contacts.connection import PortalConnection
-from hubspot.contacts.exc import HubspotAuthenticationError
-from hubspot.contacts.exc import HubspotClientError
-from hubspot.contacts.exc import HubspotServerError
-from hubspot.contacts.exc import HubspotUnsupportedResponseError
+from hubspot.connection import APIKey
+from hubspot.connection import OAuthKey
+from hubspot.connection import PortalConnection
+from hubspot.connection.exc import HubspotAuthenticationError
+from hubspot.connection.exc import HubspotClientError
+from hubspot.connection.exc import HubspotServerError
+from hubspot.connection.exc import HubspotUnsupportedResponseError
 
-from tests.utils.generic import get_uuid4_str
+from tests.utils import get_uuid4_str
 
 
 _STUB_PATH_INFO = '/foo'
@@ -98,7 +98,7 @@ class TestPortalConnection(object):
         assert_in('User-Agent', prepared_request.headers)
 
         user_agent_header_value = prepared_request.headers['User-Agent']
-        ok_(user_agent_header_value.startswith('hubspot-contacts/'))
+        ok_(user_agent_header_value.startswith('HubSpot Python Client/'))
 
     def test_change_source(self):
         change_source = get_uuid4_str()

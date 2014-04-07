@@ -3,8 +3,8 @@
 # Copyright (c) 2014, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of hubspot-contacts
-# <https://github.com/2degrees/hubspot-contacts>, which is subject to the
+# This file is part of hubspot-connection
+# <https://github.com/2degrees/hubspot-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -17,10 +17,10 @@
 from nose.tools import assert_is_instance
 from nose.tools import eq_
 
-from hubspot.test_utils import ConstantResponseDataMaker
-from hubspot.test_utils import MockPortalConnection
-from hubspot.test_utils import RemoteMethod
-from hubspot.test_utils import RemoteMethodInvocation
+from hubspot.connection.testing import ConstantResponseDataMaker
+from hubspot.connection.testing import MockPortalConnection
+from hubspot.connection.testing import RemoteMethod
+from hubspot.connection.testing import RemoteMethodInvocation
 
 
 _STUB_PATH_INFO = '/foo'

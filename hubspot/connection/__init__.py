@@ -3,8 +3,8 @@
 # Copyright (c) 2014, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of hubspot-contacts
-# <https://github.com/2degrees/hubspot-contacts>, which is subject to the
+# This file is part of hubspot-connection
+# <https://github.com/2degrees/hubspot-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -30,16 +30,16 @@ from requests.auth import AuthBase
 from requests.sessions import Session
 from voluptuous import Schema
 
-from hubspot.contacts._schemas._validators import Constant
-from hubspot.contacts.exc import HubspotAuthenticationError
-from hubspot.contacts.exc import HubspotClientError
-from hubspot.contacts.exc import HubspotServerError
-from hubspot.contacts.exc import HubspotUnsupportedResponseError
+from hubspot.connection._validators import Constant
+from hubspot.connection.exc import HubspotAuthenticationError
+from hubspot.connection.exc import HubspotClientError
+from hubspot.connection.exc import HubspotServerError
+from hubspot.connection.exc import HubspotUnsupportedResponseError
 
 
-_DISTRIBUTION_NAME = 'hubspot-contacts'
+_DISTRIBUTION_NAME = 'hubspot-connection'
 _DISTRIBUTION_VERSION = get_distribution(_DISTRIBUTION_NAME).version
-_USER_AGENT = _DISTRIBUTION_NAME + '/' + _DISTRIBUTION_VERSION
+_USER_AGENT = 'HubSpot Python Client/' + _DISTRIBUTION_VERSION
 
 
 _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(

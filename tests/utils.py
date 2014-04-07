@@ -3,8 +3,8 @@
 # Copyright (c) 2014, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of hubspot-contacts
-# <https://github.com/2degrees/hubspot-contacts>, which is subject to the
+# This file is part of hubspot-connection
+# <https://github.com/2degrees/hubspot-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -14,19 +14,9 @@
 #
 ##############################################################################
 
-from abc import ABCMeta
-from abc import abstractproperty
-
-from nose.tools import eq_
+from uuid import uuid4 as get_uuid4
 
 
-class BaseMethodTestCase(object):
-
-    __metaclass__ = ABCMeta
-
-    _REMOTE_METHOD = abstractproperty()
-
-    @classmethod
-    def _assert_expected_remote_method_used(cls, connection):
-        for remote_method_invocation in connection.remote_method_invocations:
-            eq_(cls._REMOTE_METHOD, remote_method_invocation.remote_method)
+def get_uuid4_str():
+    uuid4 = get_uuid4()
+    return str(uuid4)

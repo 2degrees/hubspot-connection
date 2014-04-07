@@ -3,8 +3,8 @@
 # Copyright (c) 2014, 2degrees Limited.
 # All Rights Reserved.
 #
-# This file is part of hubspot-contacts
-# <https://github.com/2degrees/hubspot-contacts>, which is subject to the
+# This file is part of hubspot-connection
+# <https://github.com/2degrees/hubspot-connection>, which is subject to the
 # provisions of the BSD at
 # <http://dev.2degreesnetwork.com/p/2degrees-license.html>. A copy of the
 # license should accompany this distribution. THIS SOFTWARE IS PROVIDED "AS IS"
@@ -17,8 +17,6 @@
 from collections import namedtuple
 
 from pyrecord import Record
-
-from tests.utils.generic import convert_object_strings_to_unicode
 
 
 # namedtuple is used instead of a record because we need immutable instances
@@ -87,7 +85,7 @@ class MockPortalConnection(object):
                 response_data_maker(query_string_args, body_deserialization)
         else:
             response_data = None
-        return convert_object_strings_to_unicode(response_data)
+        return _convert_object_strings_to_unicode(response_data)
 
     def get_invocations_for_remote_method(self, remote_method):
         filtered_remote_method_invocations = [
@@ -95,6 +93,23 @@ class MockPortalConnection(object):
                 invocation.remote_method == remote_method
             ]
         return filtered_remote_method_invocations
+
+
+def _convert_object_strings_to_unicode(object_):
+    if isinstance(object_, str):
+        object_converted = unicode(object_)
+    elif isinstance(object_, (list, tuple)):
+        object_converted = \
+            [_convert_object_strings_to_unicode(value) for value in object_]
+    elif isinstance(object_, dict):
+        object_converted = {}
+        for key, value in object_.items():
+            object_converted[_convert_object_strings_to_unicode(key)] = \
+                _convert_object_strings_to_unicode(value)
+    else:
+        object_converted = object_
+
+    return object_converted
 
 
 class ConstantResponseDataMaker(object):
