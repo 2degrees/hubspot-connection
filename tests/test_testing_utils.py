@@ -178,3 +178,9 @@ class TestMockPortalConnection(object):
             expected_filtered_remote_method2_invocations,
             filtered_remote_method2_invocations,
             )
+
+
+def test_constant_response_data_maker():
+    response_data_maker = ConstantResponseDataMaker(_STUB_RESPONSE_DATA)
+    response_data = response_data_maker(None, None)
+    eq_(_STUB_RESPONSE_DATA, response_data)
