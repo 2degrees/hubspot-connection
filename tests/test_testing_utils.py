@@ -15,8 +15,10 @@
 ##############################################################################
 
 from nose.tools import assert_is_instance
+from nose.tools import assert_raises
 from nose.tools import eq_
 
+from hubspot.connection.testing import ConstantMultiResponseDataMaker
 from hubspot.connection.testing import ConstantResponseDataMaker
 from hubspot.connection.testing import MockPortalConnection
 from hubspot.connection.testing import RemoteMethod
@@ -184,3 +186,35 @@ def test_constant_response_data_maker():
     response_data_maker = ConstantResponseDataMaker(_STUB_RESPONSE_DATA)
     response_data = response_data_maker(None, None)
     eq_(_STUB_RESPONSE_DATA, response_data)
+
+
+class TestConstantMultiResponseDataMaker(object):
+
+    _STUB_RESPONSE2_DATA = None
+
+    _STUB_RESPONSES_DATA = [
+        _STUB_RESPONSE_DATA,
+        _STUB_RESPONSE2_DATA,
+        ]
+
+    def setup(self):
+        self.response_data_maker = \
+            ConstantMultiResponseDataMaker(self._STUB_RESPONSES_DATA)
+
+    def test_single_request(self):
+        response_data = self.response_data_maker(None, None)
+        eq_(_STUB_RESPONSE_DATA, response_data)
+
+    def test_multiple_requests(self):
+        response1_data = self.response_data_maker(None, None)
+        eq_(_STUB_RESPONSE_DATA, response1_data)
+
+        response2_data = self.response_data_maker(None, None)
+        eq_(self._STUB_RESPONSE2_DATA, response2_data)
+
+    def test_too_many_requests(self):
+        self.response_data_maker(None, None)
+        self.response_data_maker(None, None)
+
+        with assert_raises(IndexError):
+            self.response_data_maker(None, None)

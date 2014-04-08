@@ -116,7 +116,24 @@ class ConstantResponseDataMaker(object):
 
     def __init__(self, response_data):
         super(ConstantResponseDataMaker, self).__init__()
-        self.response_data = response_data
+        self._response_data = response_data
 
     def __call__(self, query_string_args, body_deserialization):
-        return self.response_data
+        return self._response_data
+
+
+class ConstantMultiResponseDataMaker(object):
+
+    def __init__(self, responses_data):
+        super(ConstantMultiResponseDataMaker, self).__init__()
+
+        self._responses_data = responses_data
+        self._requests_made_count = 0
+
+    def __call__(self, query_string_args, body_deserialization):
+        response_data = self._responses_data[self._requests_made_count]
+        self._requests_made_count += 1
+        return response_data
+
+
+NULL_RESPONSE_DATA_MAKER = ConstantResponseDataMaker(None)
