@@ -217,6 +217,7 @@ class TestErrorResponses(object):
         exception = context_manager.exception
         eq_(500, exception.http_status_code)
         eq_('500 Reason', repr(exception))
+        eq_('500 Reason', str(exception))
 
     def test_client_error_response(self):
         request_id = get_uuid4_str()
