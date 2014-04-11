@@ -21,6 +21,7 @@ from nose.tools import eq_
 from hubspot.connection.testing import ConstantMultiResponseDataMaker
 from hubspot.connection.testing import ConstantResponseDataMaker
 from hubspot.connection.testing import MockPortalConnection
+from hubspot.connection.testing import NULL_RESPONSE_DATA_MAKER
 from hubspot.connection.testing import RemoteMethod
 from hubspot.connection.testing import RemoteMethodInvocation
 
@@ -119,13 +120,6 @@ class TestMockPortalConnection(object):
 
         eq_(_STUB_RESPONSE_DATA, response_data)
 
-    def test_no_response_data_maker(self):
-        connection = MockPortalConnection()
-
-        response_data = connection.send_get_request(_STUB_PATH_INFO)
-
-        eq_(None, response_data)
-
     def test_response_data_strings(self):
         """Strings in the response data are converted to unicode"""
         remote_method = RemoteMethod(_STUB_PATH_INFO, 'GET')
@@ -153,13 +147,18 @@ class TestMockPortalConnection(object):
             )
 
     def test_remote_method_invocation_filtering(self):
-        connection = MockPortalConnection()
+        remote_method1 = RemoteMethod(_STUB_PATH_INFO, 'POST')
+        remote_method2 = RemoteMethod(_STUB_PATH_INFO, 'GET')
+        response_data_maker_by_remote_method = {
+            remote_method1: NULL_RESPONSE_DATA_MAKER,
+            remote_method2: NULL_RESPONSE_DATA_MAKER,
+            }
+        connection = MockPortalConnection(response_data_maker_by_remote_method)
 
         connection.send_post_request(_STUB_PATH_INFO, None)
         connection.send_get_request(_STUB_PATH_INFO)
         connection.send_post_request(_STUB_PATH_INFO, _STUB_RESPONSE_DATA)
 
-        remote_method1 = RemoteMethod(_STUB_PATH_INFO, 'POST')
         filtered_remote_method1_invocations = \
             connection.get_invocations_for_remote_method(remote_method1)
         expected_filtered_remote_method1_invocations = [
@@ -171,7 +170,6 @@ class TestMockPortalConnection(object):
             expected_filtered_remote_method1_invocations,
             )
 
-        remote_method2 = RemoteMethod(_STUB_PATH_INFO, 'GET')
         filtered_remote_method2_invocations = \
             connection.get_invocations_for_remote_method(remote_method2)
         expected_filtered_remote_method2_invocations = \

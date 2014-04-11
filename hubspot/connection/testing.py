@@ -35,11 +35,11 @@ RemoteMethodInvocation = Record.create_type(
 
 class MockPortalConnection(object):
 
-    def __init__(self, response_data_maker_by_remote_method=None):
+    def __init__(self, response_data_maker_by_remote_method):
         super(MockPortalConnection, self).__init__()
 
         self._response_data_maker_by_remote_method = \
-            response_data_maker_by_remote_method or {}
+            response_data_maker_by_remote_method
 
         self.remote_method_invocations = []
 
@@ -78,13 +78,10 @@ class MockPortalConnection(object):
             )
         self.remote_method_invocations.append(remote_method_invocation)
 
-        if self._response_data_maker_by_remote_method:
-            response_data_maker = \
-                self._response_data_maker_by_remote_method[remote_method]
-            response_data = \
-                response_data_maker(query_string_args, body_deserialization)
-        else:
-            response_data = None
+        response_data_maker = \
+            self._response_data_maker_by_remote_method[remote_method]
+        response_data = \
+            response_data_maker(query_string_args, body_deserialization)
         return _convert_object_strings_to_unicode(response_data)
 
     def get_invocations_for_remote_method(self, remote_method):
