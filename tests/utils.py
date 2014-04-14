@@ -14,9 +14,28 @@
 #
 ##############################################################################
 
+from re import escape as escape_regexp
 from uuid import uuid4 as get_uuid4
+
+from nose.tools import assert_raises_regexp
 
 
 def get_uuid4_str():
     uuid4 = get_uuid4()
     return str(uuid4)
+
+
+def assert_raises_substring(
+    exception_class,
+    exception_message_substring,
+    *args,
+    **kwargs
+    ):
+    exception_message_substring = escape_regexp(exception_message_substring)
+    exception_message_regexp = '^.*{}.*$'.format(exception_message_substring)
+    return assert_raises_regexp(
+        exception_class,
+        exception_message_regexp,
+        *args,
+        **kwargs
+        )

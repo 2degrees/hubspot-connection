@@ -39,7 +39,7 @@ from hubspot.connection.exc import HubspotUnsupportedResponseError
 from tests.utils import get_uuid4_str
 
 
-_STUB_PATH_INFO = '/foo'
+_STUB_URL_PATH = '/foo'
 
 _STUB_AUTHENTICATION_KEY = APIKey(get_uuid4_str())
 
@@ -72,16 +72,15 @@ class TestPortalConnection(object):
         request_sender_kwargs = {}
         if include_request_body:
             request_sender_kwargs['body_deserialization'] = body_deserialization
-        request_sender(_STUB_PATH_INFO, **request_sender_kwargs)
+        request_sender(_STUB_URL_PATH, **request_sender_kwargs)
 
         eq_(1, len(connection.prepared_requests))
 
         prepared_request = connection.prepared_requests[0]
         eq_(http_method_name, prepared_request.method)
 
-        requested_path_info = \
-            _get_path_info_from_contacts_api_url(prepared_request.url)
-        eq_(_STUB_PATH_INFO, requested_path_info)
+        requested_url_path = _get_path_from_api_url(prepared_request.url)
+        eq_(_STUB_URL_PATH, requested_url_path)
 
         if include_request_body:
             body_serialization = json_serialize(body_deserialization)
@@ -92,7 +91,7 @@ class TestPortalConnection(object):
     def test_user_agent(self):
         connection = _MockPortalConnection()
 
-        connection.send_get_request(_STUB_PATH_INFO)
+        connection.send_get_request(_STUB_URL_PATH)
 
         prepared_request = connection.prepared_requests[0]
         assert_in('User-Agent', prepared_request.headers)
@@ -104,7 +103,7 @@ class TestPortalConnection(object):
         change_source = get_uuid4_str()
         connection = _MockPortalConnection(change_source=change_source)
 
-        connection.send_get_request(_STUB_PATH_INFO)
+        connection.send_get_request(_STUB_URL_PATH)
 
         prepared_request = connection.prepared_requests[0]
         query_string_args = \
@@ -124,7 +123,7 @@ class TestPortalConnection(object):
         connection = _MockPortalConnection()
 
         extra_query_string_args = {'foo': ['bar']}
-        connection.send_get_request(_STUB_PATH_INFO, extra_query_string_args)
+        connection.send_get_request(_STUB_URL_PATH, extra_query_string_args)
 
         prepared_request = connection.prepared_requests[0]
         query_string_args = \
@@ -141,7 +140,7 @@ class TestPortalConnection(object):
         response_data_maker = _ResponseMaker(200, expected_body_deserialization)
         connection = _MockPortalConnection(response_data_maker)
 
-        response_data = connection.send_get_request(_STUB_PATH_INFO)
+        response_data = connection.send_get_request(_STUB_URL_PATH)
 
         eq_(expected_body_deserialization, response_data)
 
@@ -149,7 +148,7 @@ class TestPortalConnection(object):
         """There's no output for "204 NO CONTENT" responses."""
         connection = _MockPortalConnection()
 
-        response_data = connection.send_get_request(_STUB_PATH_INFO)
+        response_data = connection.send_get_request(_STUB_URL_PATH)
 
         eq_(None, response_data)
 
@@ -162,7 +161,7 @@ class TestPortalConnection(object):
         connection = _MockPortalConnection(unsupported_response_data_maker)
 
         with assert_raises(HubspotUnsupportedResponseError) as context_manager:
-            connection.send_get_request(_STUB_PATH_INFO)
+            connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
         eq_('Unsupported response status 304', str(exception))
@@ -178,7 +177,7 @@ class TestPortalConnection(object):
         connection = _MockPortalConnection(unsupported_response_data_maker)
 
         with assert_raises(HubspotUnsupportedResponseError) as context_manager:
-            connection.send_get_request(_STUB_PATH_INFO)
+            connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
         eq_('Unsupported response content type text/plain', str(exception))
@@ -189,7 +188,7 @@ class TestPortalConnection(object):
         connection = _MockPortalConnection(unsupported_response_data_maker)
 
         with assert_raises(HubspotUnsupportedResponseError) as context_manager:
-            connection.send_get_request(_STUB_PATH_INFO)
+            connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
         eq_('Response does not specify a Content-Type', str(exception))
@@ -202,7 +201,7 @@ class TestPortalConnection(object):
 
     def test_keep_alive(self):
         connection = _MockPortalConnection()
-        connection.send_get_request(_STUB_PATH_INFO)
+        connection.send_get_request(_STUB_URL_PATH)
         ok_(connection.adapter.is_keep_alive_always_used)
 
 
@@ -212,7 +211,7 @@ class TestErrorResponses(object):
         response_data_maker = _ResponseMaker(500)
         connection = _MockPortalConnection(response_data_maker)
         with assert_raises(HubspotServerError) as context_manager:
-            connection.send_get_request(_STUB_PATH_INFO)
+            connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
         eq_(500, exception.http_status_code)
@@ -230,7 +229,7 @@ class TestErrorResponses(object):
         connection = _MockPortalConnection(response_data_maker)
 
         with assert_raises(HubspotClientError) as context_manager:
-            connection.send_get_request(_STUB_PATH_INFO)
+            connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
         eq_(request_id, exception.request_id)
@@ -252,7 +251,7 @@ class TestAuthentication(object):
         connection = \
             _MockPortalConnection(authentication_key=authentication_key)
 
-        connection.send_get_request(_STUB_PATH_INFO)
+        connection.send_get_request(_STUB_URL_PATH)
 
         expected_credentials = {expected_key_name: [authentication_key_value]}
         prepared_request = connection.prepared_requests[0]
@@ -277,7 +276,7 @@ class TestAuthentication(object):
             )
 
         with assert_raises(HubspotAuthenticationError) as context_manager:
-            connection.send_get_request(_STUB_PATH_INFO)
+            connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
 
@@ -366,13 +365,13 @@ class _ResponseMaker(object):
 _EMPTY_RESPONSE_MAKER = _ResponseMaker(204)
 
 
-def _get_path_info_from_contacts_api_url(contacts_api_url):
-    assert contacts_api_url.startswith(PortalConnection._API_URL)
+def _get_path_from_api_url(api_url):
+    assert api_url.startswith(PortalConnection._API_URL)
 
-    contacts_api_url_length = len(PortalConnection._API_URL)
-    path_and_query_string = contacts_api_url[contacts_api_url_length:]
-    path_info = path_and_query_string.split('?')[0]
-    return path_info
+    api_url_length = len(PortalConnection._API_URL)
+    api_url_path_and_query_string = api_url[api_url_length:]
+    api_url_path = api_url_path_and_query_string.split('?')[0]
+    return api_url_path
 
 
 def _get_query_string_args_from_url(url):

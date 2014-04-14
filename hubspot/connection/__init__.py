@@ -57,7 +57,7 @@ _HTTP_CONNECTION_MAX_RETRIES = 3
 
 class PortalConnection(object):
 
-    _API_URL = 'https://api.hubapi.com/contacts/v1'
+    _API_URL = 'https://api.hubapi.com'
 
     def __init__(self, authentication_key, change_source):
         super(PortalConnection, self).__init__()
@@ -72,34 +72,34 @@ class PortalConnection(object):
         http_adapter = HTTPAdapter(max_retries=_HTTP_CONNECTION_MAX_RETRIES)
         self._session.mount('', http_adapter)
 
-    def send_get_request(self, path_info, query_string_args=None):
-        return self._send_request('GET', path_info, query_string_args)
+    def send_get_request(self, url_path, query_string_args=None):
+        return self._send_request('GET', url_path, query_string_args)
 
-    def send_post_request(self, path_info, body_deserialization):
+    def send_post_request(self, url_path, body_deserialization):
         return self._send_request(
             'POST',
-            path_info,
+            url_path,
             body_deserialization=body_deserialization,
             )
 
-    def send_put_request(self, path_info, body_deserialization):
+    def send_put_request(self, url_path, body_deserialization):
         return self._send_request(
             'PUT',
-            path_info,
+            url_path,
             body_deserialization=body_deserialization,
             )
 
-    def send_delete_request(self, path_info):
-        return self._send_request('DELETE', path_info)
+    def send_delete_request(self, url_path):
+        return self._send_request('DELETE', url_path)
 
     def _send_request(
         self,
         method,
-        path_info,
+        url_path,
         query_string_args=None,
         body_deserialization=None,
         ):
-        url = self._API_URL + path_info
+        url = self._API_URL + url_path
 
         query_string_args = query_string_args or {}
         query_string_args = dict(query_string_args, auditId=self._change_source)

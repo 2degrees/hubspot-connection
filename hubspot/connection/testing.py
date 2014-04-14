@@ -14,82 +14,158 @@
 #
 ##############################################################################
 
-from collections import namedtuple
+from copy import deepcopy
 
 from pyrecord import Record
 
 
-# namedtuple is used instead of a record because we need immutable instances
-RemoteMethod = namedtuple('RemoteMethod', ['path_info', 'http_method'])
-
-
-RemoteMethodInvocation = Record.create_type(
-    'RemoteMethodInvocation',
-    'remote_method',
+APICall = Record.create_type(
+    'APICall',
+    'url_path',
+    'http_method',
     'query_string_args',
-    'body_deserialization',
+    'request_body_deserialization',
     query_string_args=None,
-    body_deserialization=None,
+    request_body_deserialization=None,
     )
+
+
+SuccessfulAPICall = APICall.extend_type(
+    'SuccessfulAPICall',
+    'response_body_deserialization',
+    )
+
+
+UnsuccessfulAPICall = APICall.extend_type('UnsuccessfulAPICall', 'exception')
 
 
 class MockPortalConnection(object):
 
-    def __init__(self, response_data_maker_by_remote_method):
+    def __init__(self, *api_calls_simulators):
         super(MockPortalConnection, self).__init__()
 
-        self._response_data_maker_by_remote_method = \
-            response_data_maker_by_remote_method
+        self._expected_api_calls = []
+        for api_calls_simulator in api_calls_simulators:
+            for api_call in api_calls_simulator():
+                api_call = _normalize_api_call(api_call)
+                self._expected_api_calls.append(api_call)
 
-        self.remote_method_invocations = []
+        self._request_count = 0
 
-    def send_get_request(self, path_info, query_string_args=None):
-        remote_method = RemoteMethod(path_info, 'GET')
-        return self._call_remote_method(remote_method, query_string_args)
+    def __enter__(self):
+        return self
 
-    def send_post_request(self, path_info, body_deserialization):
-        remote_method = RemoteMethod(path_info, 'POST')
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type:
+            return
+
+        expected_api_call_count = len(self._expected_api_calls)
+        pending_api_call_count = expected_api_call_count - self._request_count
+        error_message = \
+            '{} more requests were expected'.format(pending_api_call_count)
+        assert expected_api_call_count == self._request_count, error_message
+
+    def send_get_request(self, url_path, query_string_args=None):
+        return self._call_remote_method(url_path, 'GET', query_string_args)
+
+    def send_post_request(self, url_path, body_deserialization):
         return self._call_remote_method(
-            remote_method,
-            body_deserialization=body_deserialization,
+            url_path,
+            'POST',
+            request_body_deserialization=body_deserialization,
             )
 
-    def send_put_request(self, path_info, body_deserialization):
-        remote_method = RemoteMethod(path_info, 'PUT')
+    def send_put_request(self, url_path, body_deserialization):
         return self._call_remote_method(
-            remote_method,
-            body_deserialization=body_deserialization,
+            url_path,
+            'PUT',
+            request_body_deserialization=body_deserialization,
             )
 
-    def send_delete_request(self, path_info):
-        remote_method = RemoteMethod(path_info, 'DELETE')
-        return self._call_remote_method(remote_method)
+    def send_delete_request(self, url_path):
+        return self._call_remote_method(url_path, 'DELETE')
 
     def _call_remote_method(
         self,
-        remote_method,
+        url_path,
+        http_method,
         query_string_args=None,
-        body_deserialization=None,
+        request_body_deserialization=None,
         ):
-        remote_method_invocation = RemoteMethodInvocation(
-            remote_method,
+        self._require_enough_api_calls(url_path)
+
+        expected_api_call = self._expected_api_calls[self._request_count]
+
+        _assert_request_matches_api_call(
+            expected_api_call,
+            url_path,
+            http_method,
             query_string_args,
-            body_deserialization,
+            request_body_deserialization,
             )
-        self.remote_method_invocations.append(remote_method_invocation)
 
-        response_data_maker = \
-            self._response_data_maker_by_remote_method[remote_method]
-        response_data = \
-            response_data_maker(query_string_args, body_deserialization)
-        return _convert_object_strings_to_unicode(response_data)
+        self._request_count += 1
 
-    def get_invocations_for_remote_method(self, remote_method):
-        filtered_remote_method_invocations = [
-            invocation for invocation in self.remote_method_invocations if
-                invocation.remote_method == remote_method
-            ]
-        return filtered_remote_method_invocations
+        if isinstance(expected_api_call, UnsuccessfulAPICall):
+            raise expected_api_call.exception
+
+        return expected_api_call.response_body_deserialization
+
+    @property
+    def api_calls(self):
+        api_calls = self._expected_api_calls[:self._request_count]
+        return api_calls
+
+    def _require_enough_api_calls(self, url_path):
+        are_enough_api_calls = \
+            self._request_count < len(self._expected_api_calls)
+        error_message = 'Not enough API calls for new requests ' \
+            '(requested {!r})'.format(url_path)
+        assert are_enough_api_calls, error_message
+
+
+def _normalize_api_call(api_call):
+    if isinstance(api_call, SuccessfulAPICall):
+        api_call = deepcopy(api_call)
+        api_call.response_body_deserialization = \
+            _convert_object_strings_to_unicode(
+                api_call.response_body_deserialization,
+                )
+    return api_call
+
+
+def _assert_request_matches_api_call(
+    api_call,
+    url_path,
+    http_method,
+    query_string_args,
+    request_body_deserialization,
+    ):
+    url_paths_match = api_call.url_path == url_path
+    assert url_paths_match, \
+        'Expected URL path {!r}, got {!r}'.format(api_call.url_path, url_path)
+
+    query_string_args_match = api_call.query_string_args == query_string_args
+    assert query_string_args_match, \
+        'Expected query string arguments {!r}, got {!r}'.format(
+            api_call.query_string_args,
+            query_string_args,
+            )
+
+    http_methods_match = api_call.http_method == http_method
+    assert http_methods_match, \
+        'Expected HTTP method {!r}, got {!r}'.format(
+            api_call.http_method,
+            http_method,
+            )
+
+    request_body_deserializations_match = \
+        api_call.request_body_deserialization == request_body_deserialization
+    assert request_body_deserializations_match, \
+        'Expected request body deserialization {!r}, got {!r}'.format(
+            api_call.request_body_deserialization,
+            request_body_deserialization,
+            )
 
 
 def _convert_object_strings_to_unicode(object_):
@@ -109,28 +185,11 @@ def _convert_object_strings_to_unicode(object_):
     return object_converted
 
 
-class ConstantResponseDataMaker(object):
-
-    def __init__(self, response_data):
-        super(ConstantResponseDataMaker, self).__init__()
-        self._response_data = response_data
-
-    def __call__(self, query_string_args, body_deserialization):
-        return self._response_data
-
-
-class ConstantMultiResponseDataMaker(object):
-
-    def __init__(self, responses_data):
-        super(ConstantMultiResponseDataMaker, self).__init__()
-
-        self._responses_data = responses_data
-        self._requests_made_count = 0
-
-    def __call__(self, query_string_args, body_deserialization):
-        response_data = self._responses_data[self._requests_made_count]
-        self._requests_made_count += 1
-        return response_data
-
-
-NULL_RESPONSE_DATA_MAKER = ConstantResponseDataMaker(None)
+def test_():
+    expected_api_calls_simulators = [
+        FailedGetAllContacts(TimeoutError, property_names=['firstname']),
+        GetAllContacts(make_contacts(3), property_names=['firstname'], available_properties=available_properties),  # available_properties REQUIRED
+        SaveContacts(make_contacts(2), available_properties=available_properties),  # available_properties REQUIRED
+        ]
+    with MockPortalConnection(expected_api_calls_simulators) as connection:
+        sync_hubspot(connection)
