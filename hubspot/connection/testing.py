@@ -183,13 +183,3 @@ def _convert_object_strings_to_unicode(object_):
         object_converted = object_
 
     return object_converted
-
-
-def test_():
-    expected_api_calls_simulators = [
-        FailedGetAllContacts(TimeoutError, property_names=['firstname']),
-        GetAllContacts(make_contacts(3), property_names=['firstname'], available_properties=available_properties),  # available_properties REQUIRED
-        SaveContacts(make_contacts(2), available_properties=available_properties),  # available_properties REQUIRED
-        ]
-    with MockPortalConnection(expected_api_calls_simulators) as connection:
-        sync_hubspot(connection)
