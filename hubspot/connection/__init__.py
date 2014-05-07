@@ -14,6 +14,7 @@
 #
 ##############################################################################
 
+from httplib import ACCEPTED as HTTP_STATUS_ACCEPTED
 from httplib import NO_CONTENT as HTTP_STATUS_NO_CONTENT
 from httplib import OK as HTTP_STATUS_OK
 from httplib import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
@@ -53,6 +54,10 @@ _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
 
 
 _HTTP_CONNECTION_MAX_RETRIES = 3
+
+
+_HTTP_STATUS_CODES_WITH_EMPTY_BODIES = \
+    frozenset((HTTP_STATUS_ACCEPTED, HTTP_STATUS_NO_CONTENT))
 
 
 class PortalConnection(object):
@@ -128,7 +133,7 @@ class PortalConnection(object):
 
         if response.status_code == HTTP_STATUS_OK:
             response_body_deserialization = response.json()
-        elif response.status_code == HTTP_STATUS_NO_CONTENT:
+        elif response.status_code in _HTTP_STATUS_CODES_WITH_EMPTY_BODIES:
             response_body_deserialization = None
         else:
             exception_message = \

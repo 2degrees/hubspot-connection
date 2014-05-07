@@ -144,6 +144,15 @@ class TestPortalConnection(object):
 
         eq_(expected_body_deserialization, response_data)
 
+    def test_accepted_response(self):
+        """There's no output for "202 ACCEPTED" responses."""
+        response_data_maker = _ResponseMaker(202)
+        connection = _MockPortalConnection(response_data_maker)
+
+        response_data = connection.send_get_request(_STUB_URL_PATH)
+
+        eq_(None, response_data)
+
     def test_no_content_response(self):
         """There's no output for "204 NO CONTENT" responses."""
         connection = _MockPortalConnection()
@@ -311,7 +320,8 @@ class _MockRequestsAdapter(RequestsHTTPAdapter):
     def __init__(self, response_data_maker=None, *args, **kwargs):
         super(_MockRequestsAdapter, self).__init__(*args, **kwargs)
 
-        self._response_data_maker = response_data_maker or _EMPTY_RESPONSE_MAKER
+        self._response_data_maker = \
+            response_data_maker or _NO_CONTENT_RESPONSE_MAKER
 
         self.prepared_requests = []
         self.is_keep_alive_always_used = True
@@ -357,13 +367,13 @@ class _ResponseMaker(object):
                 '{}; charset=UTF-8'.format(self._content_type)
             response.headers['Content-Type'] = content_type_header_value
 
-        if self._status_code != 204 and self._body_deserialization:
+        if self._status_code not in (202, 204) and self._body_deserialization:
             response._content = json_serialize(self._body_deserialization)
 
         return response
 
 
-_EMPTY_RESPONSE_MAKER = _ResponseMaker(204)
+_NO_CONTENT_RESPONSE_MAKER = _ResponseMaker(204)
 
 
 def _get_path_from_api_url(api_url):
