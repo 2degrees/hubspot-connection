@@ -16,10 +16,12 @@
 
 
 class HubspotException(Exception):
+    """A generic Hubspot error"""
     pass
 
 
 class HubspotUnsupportedResponseError(HubspotException):
+    """Unsupported response from Hubspot"""
     pass
 
 
@@ -33,6 +35,7 @@ class HubspotClientError(HubspotException):
 
 
 class HubspotAuthenticationError(HubspotClientError):
+    """Hubspot authentication error"""
     pass
 
 

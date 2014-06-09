@@ -40,7 +40,7 @@ from hubspot.connection.exc import HubspotUnsupportedResponseError
 
 _DISTRIBUTION_NAME = 'hubspot-connection'
 _DISTRIBUTION_VERSION = get_distribution(_DISTRIBUTION_NAME).version
-_USER_AGENT = 'HubSpot Python Client/' + _DISTRIBUTION_VERSION
+_USER_AGENT = 'HubSpot Python Client/' + _DISTRIBUTION_VERSION #:
 
 
 _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
@@ -53,7 +53,7 @@ _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
     )
 
 
-_HTTP_CONNECTION_MAX_RETRIES = 3
+_HTTP_CONNECTION_MAX_RETRIES = 3 #:
 
 
 _HTTP_STATUS_CODES_WITH_EMPTY_BODIES = \
@@ -61,7 +61,12 @@ _HTTP_STATUS_CODES_WITH_EMPTY_BODIES = \
 
 
 class PortalConnection(object):
+    """
+    Creates a connection to hubspot
 
+    :param authentication_key: :class:`APIKey`
+    :param change_source: The string passed as Hubspot's ``auditId`` parameter
+    """
     _API_URL = 'https://api.hubapi.com'
 
     def __init__(self, authentication_key, change_source):
@@ -78,9 +83,23 @@ class PortalConnection(object):
         self._session.mount('', http_adapter)
 
     def send_get_request(self, url_path, query_string_args=None):
+        """
+        Sends a GET request to Hubspot
+
+        :param url_path: The url path for the endpoint
+        :param query_string_args: :class:`dict` The query string arguments
+
+        """
         return self._send_request('GET', url_path, query_string_args)
 
     def send_post_request(self, url_path, body_deserialization):
+        """
+        Sends a POST request to Hubspot
+
+        :param url_path: The url path for the endpoint
+        :param body_deserialization: :class:`dict` The request's body message deserialized
+
+        """
         return self._send_request(
             'POST',
             url_path,
@@ -88,6 +107,13 @@ class PortalConnection(object):
             )
 
     def send_put_request(self, url_path, body_deserialization):
+        """
+        Sends a PUT request to Hubspot
+
+        :param url_path: The url path for the endpoint
+        :param body_deserialization: :class:`dict` The request's body message deserialized
+
+        """
         return self._send_request(
             'PUT',
             url_path,
@@ -95,6 +121,12 @@ class PortalConnection(object):
             )
 
     def send_delete_request(self, url_path):
+        """
+        Sends a DELETE request to Hubspot
+
+        :param url_path: The url path for the endpoint
+
+        """
         return self._send_request('DELETE', url_path)
 
     def _send_request(
