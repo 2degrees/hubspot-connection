@@ -25,8 +25,7 @@ Example:
 
 .. code-block:: python
 
-    account_key = 'HUBSPOT-ACCOUNT-KEY'
-    authentication_key = APIKey(account_key)
+    authentication_key = APIKey('HUBSPOT-ACCOUNT-KEY')
 
 
 How to make requests to Hubspot
@@ -42,8 +41,8 @@ fixed number of max retries and a user agent, so there is not need to configure
 .. autodata:: hubspot.connection._USER_AGENT
 
 With this package you can easily create new hubspot API clients, by using
-:class:`~hubspot.connection.PortalConnection` instance to send the requests, only
-needing to know the endpoint and arguments needed by hubspot.
+:class:`~hubspot.connection.PortalConnection` instance to send the requests,
+only needing to know the endpoint and arguments needed by hubspot.
 
 
 Example:
@@ -84,9 +83,13 @@ Error Handling
 Testing
 -------
 
-To aid in testing, :mod:`hubspot.connection` comes bundled with :class:`~hubspot.connection.testing.MockPortalConnection` which aids in testing Husbpot API Clients.
+To aid in testing, :mod:`hubspot.connection` comes bundled with
+:class:`~hubspot.connection.testing.MockPortalConnection` which aids in testing
+Husbpot API Clients.
 
-It receives a callable with the expected mock api calls, to check that only the expected calls with the expected arguments were called.
+It receives a callable with the expected mock api calls, to check that the
+expected calls with the expected arguments were called, it also verifies
+that no other calls were done or that there were insufficient API calls.
 
 
 Example:
@@ -118,3 +121,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
