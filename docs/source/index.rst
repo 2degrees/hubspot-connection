@@ -1,12 +1,21 @@
 Hubspot connection for API clients
 **********************************
 
+:Latest release: |release|
+:Download: `<http://pypi.python.org/pypi/hubspot-connection>`_
+:Development: `<https://github.com/2degrees/hubspot-connection>`_
+:Author: `2degrees Limited <http://dev.2degreesnetwork.com/>`_
+
 This is a helper for creating Hubspot API clients, :mod:`hubspot.connection` will
 take care of connecting and authenticating to hubspot.
 
+.. toctree::
+    :maxdepth: 2
 
-Tutorial:
----------
+    changelog
+
+Tutorial
+--------
 
 Authentication
 ++++++++++++++
@@ -87,6 +96,9 @@ To aid in testing, :mod:`hubspot.connection` comes bundled with
 :class:`~hubspot.connection.testing.MockPortalConnection` which aids in testing
 Husbpot API Clients.
 
+MockPortalConnection
+++++++++++++++++++++
+
 It receives a callable with the expected mock api calls, to check that the
 expected calls with the expected arguments were called, it also verifies
 that no other calls were done or that there were insufficient API calls.
@@ -113,6 +125,43 @@ Example:
 
         with MockPortalConnection(expected_api_calls_simulator) as conn:
             conn.send_delete_request(url_path)
+
+
+API
+---
+
+Connection
+++++++++++
+
+.. automodule:: hubspot.connection
+
+
+Exceptions
+++++++++++
+
+.. automodule:: hubspot.connection.exc
+
+
+Testing Utils
++++++++++++++
+
+.. autoclass:: hubspot.connection.testing.APICall
+
+.. autoclass:: hubspot.connection.testing.SuccessfulAPICall
+
+.. autoclass:: hubspot.connection.testing.UnsuccessfulAPICall
+
+.. automodule:: hubspot.connection.testing
+
+
+Support
+-------
+
+For general hubspot.connection support, please visit the `Github Page
+<https://github.com/2degrees/hubspot-connection>`_.
+
+For suggestions and questions about the library, please use our `2degrees-floss
+mailing list <http://groups.google.com/group/2degrees-floss/>`_.
 
 
 Indices and tables
