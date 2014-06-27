@@ -71,11 +71,9 @@ class MockPortalConnection(object):
         assert expected_api_call_count == self._request_count, error_message
 
     def send_get_request(self, url_path, query_string_args=None):
-        """ Simulates a GET request """
         return self._call_remote_method(url_path, 'GET', query_string_args)
 
     def send_post_request(self, url_path, body_deserialization):
-        """ Simulates a POST request """
         return self._call_remote_method(
             url_path,
             'POST',
@@ -83,7 +81,6 @@ class MockPortalConnection(object):
             )
 
     def send_put_request(self, url_path, body_deserialization):
-        """ Simulates a PUT request """
         return self._call_remote_method(
             url_path,
             'PUT',
@@ -91,7 +88,6 @@ class MockPortalConnection(object):
             )
 
     def send_delete_request(self, url_path):
-        """ Simulates a DELETE request """
         return self._call_remote_method(url_path, 'DELETE')
 
     def _call_remote_method(
@@ -122,7 +118,6 @@ class MockPortalConnection(object):
 
     @property
     def api_calls(self):
-        """ Stores the expected api calls """
         api_calls = self._expected_api_calls[:self._request_count]
         return api_calls
 

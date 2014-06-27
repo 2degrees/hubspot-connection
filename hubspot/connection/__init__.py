@@ -40,7 +40,7 @@ from hubspot.connection.exc import HubspotUnsupportedResponseError
 
 _DISTRIBUTION_NAME = 'hubspot-connection'
 _DISTRIBUTION_VERSION = get_distribution(_DISTRIBUTION_NAME).version
-_USER_AGENT = 'HubSpot Python Client/' + _DISTRIBUTION_VERSION #:
+_USER_AGENT = 'HubSpot Python Client/' + _DISTRIBUTION_VERSION
 
 
 _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
@@ -53,7 +53,7 @@ _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
     )
 
 
-_HTTP_CONNECTION_MAX_RETRIES = 3 #:
+_HTTP_CONNECTION_MAX_RETRIES = 3
 
 
 _HTTP_STATUS_CODES_WITH_EMPTY_BODIES = \
@@ -64,8 +64,10 @@ class PortalConnection(object):
     """
     Creates a connection to hubspot
 
-    :param authentication_key: :class:`APIKey`
-    :param change_source: The string passed as Hubspot's ``auditId`` parameter
+    :param authentication_key: This can be either an :class:`APIKey` or an \
+            :class:`OAuthKey` instance
+    :param basestring change_source: The string passed as Hubspot's \
+            ``auditId`` parameter
     """
     _API_URL = 'https://api.hubapi.com'
 
@@ -86,8 +88,11 @@ class PortalConnection(object):
         """
         Sends a GET request to Hubspot
 
-        :param url_path: The url path for the endpoint
-        :param query_string_args: :class:`dict` The query string arguments
+        :param basestring url_path: The url path for the endpoint
+        :param dict query_string_args: The query string arguments
+
+        :return: Decoded version of the ``JSON`` that HubSpot put in \
+                the body of the response.
 
         """
         return self._send_request('GET', url_path, query_string_args)
@@ -96,9 +101,11 @@ class PortalConnection(object):
         """
         Sends a POST request to Hubspot
 
-        :param url_path: The url path for the endpoint
-        :param body_deserialization: :class:`dict` The request's body message deserialized
+        :param basestring url_path: The url path for the endpoint
+        :param dict body_deserialization: :class:`dict` The request's body message deserialized
 
+        :return: Decoded version of the ``JSON`` that HubSpot put in \
+                the body of the response.
         """
         return self._send_request(
             'POST',
@@ -110,9 +117,11 @@ class PortalConnection(object):
         """
         Sends a PUT request to Hubspot
 
-        :param url_path: The url path for the endpoint
+        :param basestring url_path: The url path for the endpoint
         :param body_deserialization: :class:`dict` The request's body message deserialized
 
+        :return: Decoded version of the ``JSON`` that HubSpot put in \
+                the body of the response.
         """
         return self._send_request(
             'PUT',
@@ -124,8 +133,10 @@ class PortalConnection(object):
         """
         Sends a DELETE request to Hubspot
 
-        :param url_path: The url path for the endpoint
+        :param basestring url_path: The url path for the endpoint
 
+        :return: Decoded version of the ``JSON`` that HubSpot put in \
+                the body of the response.
         """
         return self._send_request('DELETE', url_path)
 

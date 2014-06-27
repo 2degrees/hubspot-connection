@@ -26,7 +26,11 @@ class HubspotUnsupportedResponseError(HubspotException):
 
 
 class HubspotClientError(HubspotException):
-    """Representation of a 40X error"""
+    """
+    Representation of a 40X error
+
+    :param unicode request_id:
+    """
 
     def __init__(self, msg, request_id):
         super(HubspotClientError, self).__init__(msg)
@@ -40,7 +44,11 @@ class HubspotAuthenticationError(HubspotClientError):
 
 
 class HubspotServerError(HubspotException):
-    """Representation of a 50X error"""
+    """
+    Representation of a 50X error
+
+    :param int http_status_code:
+    """
 
     def __init__(self, msg, http_status_code):
         super(HubspotServerError, self).__init__(msg)
