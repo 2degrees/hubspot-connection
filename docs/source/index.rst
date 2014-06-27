@@ -208,6 +208,9 @@ latest code, create pull requests and raise `issues
 <https://github.com/2degrees/hubspot-connection/issues/>`_.
 
 
+Changelog
+---------
+
 .. include:: changelog.rst
 
 
