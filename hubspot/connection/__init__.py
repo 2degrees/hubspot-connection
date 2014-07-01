@@ -62,12 +62,12 @@ _HTTP_STATUS_CODES_WITH_EMPTY_BODIES = \
 
 class PortalConnection(object):
     """
-    Creates a connection to hubspot
+    Connection to HubSpot
 
     :param authentication_key: This can be either an :class:`APIKey` or an \
             :class:`OAuthKey` instance
-    :param basestring change_source: The string passed as Hubspot's \
-            ``auditId`` parameter
+    :param basestring change_source: The string passed to HubSpot as \
+            ``auditId`` in the query string
     """
     _API_URL = 'https://api.hubapi.com'
 
@@ -86,9 +86,9 @@ class PortalConnection(object):
 
     def send_get_request(self, url_path, query_string_args=None):
         """
-        Sends a GET request to Hubspot
+        Send a GET request to HubSpot
 
-        :param basestring url_path: The url path for the endpoint
+        :param basestring url_path: The URL path to the endpoint
         :param dict query_string_args: The query string arguments
 
         :return: Decoded version of the ``JSON`` that HubSpot put in \
@@ -99,10 +99,11 @@ class PortalConnection(object):
 
     def send_post_request(self, url_path, body_deserialization):
         """
-        Sends a POST request to Hubspot
+        Send a POST request to HubSpot
 
-        :param basestring url_path: The url path for the endpoint
-        :param dict body_deserialization: :class:`dict` The request's body message deserialized
+        :param basestring url_path: The URL path to the endpoint
+        :param dict body_deserialization: The request's body message \
+            deserialized
 
         :return: Decoded version of the ``JSON`` that HubSpot put in \
                 the body of the response.
@@ -115,10 +116,10 @@ class PortalConnection(object):
 
     def send_put_request(self, url_path, body_deserialization):
         """
-        Sends a PUT request to Hubspot
+        Send a PUT request to HubSpot
 
-        :param basestring url_path: The url path for the endpoint
-        :param body_deserialization: :class:`dict` The request's body message deserialized
+        :param basestring url_path: The URL path to the endpoint
+        :param body_deserialization: The request's body message deserialized
 
         :return: Decoded version of the ``JSON`` that HubSpot put in \
                 the body of the response.
@@ -131,9 +132,9 @@ class PortalConnection(object):
 
     def send_delete_request(self, url_path):
         """
-        Sends a DELETE request to Hubspot
+        Send a DELETE request to HubSpot
 
-        :param basestring url_path: The url path for the endpoint
+        :param basestring url_path: The URL path to the endpoint
 
         :return: Decoded version of the ``JSON`` that HubSpot put in \
                 the body of the response.

@@ -16,22 +16,22 @@
 
 
 class HubspotException(Exception):
-    """A generic Hubspot error"""
+    """The base HubSpot error."""
     pass
 
 
 class HubspotUnsupportedResponseError(HubspotException):
-    """Unsupported response from Hubspot"""
     pass
 
 
 class HubspotClientError(HubspotException):
     """
-    Representation of a 40X error
+    HubSpot deemed the request invalid. This represents an HTTP response code
+    of 40X, except 401
 
     :param unicode request_id:
-    """
 
+    """
     def __init__(self, msg, request_id):
         super(HubspotClientError, self).__init__(msg)
 
@@ -39,17 +39,22 @@ class HubspotClientError(HubspotException):
 
 
 class HubspotAuthenticationError(HubspotClientError):
-    """Hubspot authentication error"""
+    """
+    HubSpot rejected your authentication key. This represents an HTTP
+    response code of 401.
+
+    """
     pass
 
 
 class HubspotServerError(HubspotException):
     """
-    Representation of a 50X error
+    HubSpot failed to process the request due to a problem at their end. This
+    represents an HTTP response code of 50X.
 
     :param int http_status_code:
-    """
 
+    """
     def __init__(self, msg, http_status_code):
         super(HubspotServerError, self).__init__(msg)
 
@@ -60,3 +65,4 @@ class HubspotServerError(HubspotException):
 
     def __repr__(self):
         return '{} {}'.format(self.http_status_code, self.message)
+

@@ -4,8 +4,8 @@ HubSpot connection for API clients
 :Sponsored by: `2degrees Limited <http://dev.2degreesnetwork.com/>`_
 :Latest release: |release|
 
-**hubspot-connection** provides a lightweight abstraction layer for making requests
-to the Hubspot API.
+**hubspot-connection** provides a lightweight abstraction layer for making
+requests to the HubSpot API.
 
 **Example:**
 
@@ -28,22 +28,16 @@ Authentication
 HubSpot supports two authentication methods: OAuth and a proprietary,
 token-based method referred to as "API Key".
 
-In order to authenticate via :mod:`hubspot.connection`, the "API Key" has to be
-wrapped around an instance of the :mod:`hubspot.connection.APIKey` class, which
-in turn turn is passed on to :mod:`~hubspot.connection.PortalConnection`.
-
-The same should be done for OAuth should the user want to use this
-authentication method, but instead of using :mod:`hubspot.connection.APIKey`,
-the user should instance :mod:`hubspot.connection.OAuth` instead.
+In order to authenticate you just need to instanciate either
+:mod:`hubspot.connection.OAuthKey` or :mod:`hubspot.connection.APIKey` with the
+apropriate value.
 
 **Example:**
 
 .. code-block:: python
 
-    # OAuth Key
     authentication_key = OAuthKey('HUBSPOT-OAUTH-KEY')
 
-    # API Key
     authentication_key = APIKey('HUBSPOT-API-KEY')
 
 
@@ -51,53 +45,59 @@ How to make requests to HubSpot
 +++++++++++++++++++++++++++++++
 
 :class:`~hubspot.connection.PortalConnection` is meant to be used as a context
-manager, it takes care of keeping the connection alive retrying 3 times after
-errors. Note, this applies only to failed connections and
-timeouts, never to requests where the server returns a response.
+manager which takes care of keeping the connection alive retrying a maximum of
+3 times should there be any network-level timeout or socket errors.
 
-A good example of a library using :mod:`hubspot.connection` can be seen
-`here <https://github.com/2degrees/hubspot-contacts>`_.
+A good example of a library using :mod:`hubspot.connection` can be seen here:
+`hubspot-contacts <https://github.com/2degrees/hubspot-contacts>`_.
 
 
 Testing
 -------
 
-`hubspot-connection` comes bundled with testing utilities designed to help
-you test your own modules for communicating with HubSpot.
+`hubspot-connection` comes bundled with utilities designed to help you with
+testing.
 
-:class:`~hubspot.connection.testing.MockPortalConnection` will receive
-simulators as arguments that will then be automatically (entering and exiting
-the context manager) tested whether their calls were executed in the same
-order as the arguments, with the same url paths, body_deserialization and
-query string arguments. The number of calls received by the simulators
-will also be checked so that no more and no less than the ones expected,
-were called.
+The :class:`~hubspot.connection.testing.MockPortalConnection` is initialized
+with zero or more so-called "api call simulators" (or simply "simulators"),
+which are passed by position. Simulators are callables that receive no
+arguments and return an iterable of successful or unsuccessful API calls.
 
-Simulators are callables that receive no arguments and return an iterable of
-api calls (:class:`~hubspot.connection.testing.APICall`).
+Their role, is to tell the
+:class:`~hubspot.connection.testing.MockPortalConnection` what API calls are
+excepted to be called, and that each will have exactly the expected:
 
-To mock API Calls this library has
-:class:`~hubspot.connection.testing.SuccessfulAPICall`
-and :class:`~hubspot.connection.testing.UnsuccessfulAPICall`, along with their
-base class: :class:`~hubspot.connection.testing.APICall`.
+- URL path
+- Body deserialization
+- URL arguments
+- Method
 
+If the response is expected to be successful, it's body deserialization will be
+verified, if the response is expected to be unsuccessful, the exception will be
+checked, whether it's the correct one. To represent API calls this library
+comes with :class:`~hubspot.connection.testing.SuccessfulAPICall` and
+:class:`~hubspot.connection.testing.UnsuccessfulAPICall`.
 
-**Example of an API Call:**
+Should any unexpected API end-point get called, any of the expected end-points
+is not called or if they are in the wrong order, an ``AssertionError`` is
+raised.
+
+**Example of an API call:**
 
 .. code-block:: python
 
-    # Example of a successful mock API Call
-    stub_api_call = SuccessfulAPICall(
+    # Example of a successful API call
+    api_call = SuccessfulAPICall(
         '/foo/bar',
         'GET',
-        response_body_deserialization={'foo', 'bar'},
+        response_body_deserialization={'foo': 'bar'},
     )
 
-    # Example of an unsuccessful mock API Call
-    stub_api_call = UnsuccessfulAPICall(
+    # Example of an unsuccessful API call
+    api_call = UnsuccessfulAPICall(
         '/foo/bar',
         'GET',
-        exception=HubspotServerError('Foo is not bar'),
+        exception=HubspotServerError('Foo is not implemented', 501),
     )
 
 
@@ -109,7 +109,8 @@ base class: :class:`~hubspot.connection.testing.APICall`.
     from hubspot.connection.testing import SuccessfulAPICall
 
     def test_delete_contact_list():
-        url_path = '/contacts/v1/lists/1'
+        list_id = 1
+        url_path = '/contacts/v1/lists/{}'.format(list_id)
 
         api_call = SuccessfulAPICall(
             url_path,
@@ -119,8 +120,12 @@ base class: :class:`~hubspot.connection.testing.APICall`.
 
         expected_api_calls_simulator = lambda : [api_call]
 
-        with MockPortalConnection(expected_api_calls_simulator) as conn:
-            conn.send_delete_request(url_path)
+        with MockPortalConnection(expected_api_calls_simulator) as connection
+            delete_list(list_id, connection)
+
+    # Unit to be tested
+    def delete_contact_list(list_id, connection):
+        connection.send_delete_request('/contacts/v1/lists/{}'.format(list_id))
 
 
 API
@@ -135,7 +140,7 @@ Authentication
 
     .. attribute:: key_value
 
-        The Hubspot Api Key (`hapikey`)
+        The HubSpot API Key (`hapikey`)
 
 .. class:: hubspot.connection.OAuthKey
 
@@ -143,7 +148,7 @@ Authentication
 
     .. attribute:: key_value
 
-        The Hubspot OAuth Key (`access_token`)
+        The HubSpot OAuth Key (`access_token`)
 
 Connection
 ++++++++++
@@ -157,8 +162,8 @@ Exceptions
 .. automodule:: hubspot.connection.exc
 
 
-Testing Utils
-+++++++++++++
+Testing utilities
++++++++++++++++++
 
 .. automodule:: hubspot.connection.testing
 
@@ -166,11 +171,11 @@ Testing Utils
 
     .. attribute:: url_path
 
-        A :class:`basestring` representing the complete url for the request
+        A :class:`basestring` representing the complete URL to the request
 
     .. attribute:: http_method
 
-        A :class:`basestring` representing the HTTP Method for the request
+        A :class:`basestring` representing the HTTP Method to the request
 
     .. attribute:: query_string_args
 
@@ -178,7 +183,7 @@ Testing Utils
 
     .. attribute:: request_body_deserialization
 
-        A :class:`dict` representing the request's body
+        A representation of the request's body
 
 .. class:: hubspot.connection.testing.SuccessfulAPICall
 
@@ -186,7 +191,7 @@ Testing Utils
 
     .. attribute:: response_body_deserialization
 
-        A :class:`dict` representing the response's body
+        A represention of the response's body
 
 .. class:: hubspot.connection.testing.UnsuccessfulAPICall
 
@@ -202,7 +207,7 @@ Support
 For questions directly related to *hubspot-connection*, please use our
 `2degrees-floss mailing list <http://groups.google.com/group/2degrees-floss/>`_.
 
-Please go to `our development site on GitHub
+Please go to `our development site at GitHub
 <https://github.com/2degrees/hubspot-connection/>`_ to get the
 latest code, create pull requests and raise `issues
 <https://github.com/2degrees/hubspot-connection/issues/>`_.
@@ -212,12 +217,4 @@ Changelog
 ---------
 
 .. include:: changelog.rst
-
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 

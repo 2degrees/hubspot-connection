@@ -41,11 +41,10 @@ UnsuccessfulAPICall = APICall.extend_type('UnsuccessfulAPICall', 'exception')
 
 class MockPortalConnection(object):
     """
-    Testing util that Mocks Connection by calling the methods on the simulators
-    received on construction
+    Mock representation of a
+    :class:`~hubspot.connection.PortalConnection`
 
     """
-
     def __init__(self, *api_calls_simulators):
         super(MockPortalConnection, self).__init__()
 
