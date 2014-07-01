@@ -1,23 +1,4 @@
-HubSpot connection for API clients
-**********************************
-
-:Sponsored by: `2degrees Limited <http://dev.2degreesnetwork.com/>`_
-:Latest release: |release|
-
-**hubspot-connection** provides a lightweight abstraction layer for making
-requests to the HubSpot API.
-
-**Example:**
-
-.. code-block:: python
-
-    from hubspot.connection import APIKey
-    from hubspot.connection import PortalConnection
-
-    authentication_key = APIKey('HUBSPOT-API-KEY')
-    with PortalConnection(authentication_key, 'client') as connection:
-        contacts_data = connection.send_get_request('/contacts/v1/contacts/statistics')
-        print "Number of contacts: {}".format(contacts_data.get('contacts'))
+.. include:: ../../README.rst
 
 Tutorial
 --------
