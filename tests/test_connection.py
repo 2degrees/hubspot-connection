@@ -19,6 +19,7 @@ from urlparse import parse_qs
 from urlparse import urlparse
 
 from nose.tools import assert_dict_contains_subset
+from nose.tools import assert_equal
 from nose.tools import assert_false
 from nose.tools import assert_in
 from nose.tools import assert_is_instance
@@ -78,6 +79,13 @@ class TestPortalConnection(object):
 
         prepared_request = connection.prepared_requests[0]
         eq_(http_method_name, prepared_request.method)
+
+        if include_request_body:
+            assert_in('content-type', prepared_request.headers)
+            assert_equal(
+                'application/json',
+                prepared_request.headers['content-type']
+            )
 
         requested_url_path = _get_path_from_api_url(prepared_request.url)
         eq_(_STUB_URL_PATH, requested_url_path)

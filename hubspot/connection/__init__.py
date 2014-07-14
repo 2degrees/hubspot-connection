@@ -153,6 +153,9 @@ class PortalConnection(object):
         query_string_args = query_string_args or {}
         query_string_args = dict(query_string_args, auditId=self._change_source)
 
+        request_headers = \
+            {'content-type': 'application/json'} if body_deserialization else {}
+
         if body_deserialization:
             request_body_serialization = json_serialize(body_deserialization)
         else:
@@ -164,6 +167,7 @@ class PortalConnection(object):
             params=query_string_args,
             auth=self._authentication_handler,
             data=request_body_serialization,
+            headers=request_headers,
             )
 
         response_body_deserialization = \
