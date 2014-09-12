@@ -177,9 +177,9 @@ class PortalConnection(object):
     @classmethod
     def _deserialize_response_body(cls, response):
         cls._require_successful_response(response)
-        cls._require_json_response(response)
 
         if response.status_code == HTTP_STATUS_OK:
+            cls._require_json_response(response)
             response_body_deserialization = response.json()
         elif response.status_code in _HTTP_STATUS_CODES_WITH_EMPTY_BODIES:
             response_body_deserialization = None
