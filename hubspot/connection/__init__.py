@@ -180,7 +180,7 @@ class PortalConnection(object):
 
         if response.status_code == HTTP_STATUS_OK:
             cls._require_json_response(response)
-            response_body_deserialization = response.json()
+            response_body_deserialization = response.json() or None
         elif response.status_code in _HTTP_STATUS_CODES_WITH_EMPTY_BODIES:
             response_body_deserialization = None
         else:
