@@ -16,4 +16,4 @@ Version 1.0 Release Candidate 3 (2014-09-15)
 Version 1.0 Release Candidate 4 (2015-02-18)
 ++++++++++++++++++++++++++++++++++++++++++++
 
-- Made _HUBSPOT_ERROR_RESPONSE_SCHEMA allow extra keys
+- Allowed for extra details in error responses from Hubspot
