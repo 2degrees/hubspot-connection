@@ -50,6 +50,7 @@ _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
         'requestId': unicode,
         },
     required=True,
+    extra=True,
     )
 
 

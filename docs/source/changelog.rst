@@ -12,3 +12,8 @@ Version 1.0 Release Candidate 3 (2014-09-15)
 ++++++++++++++++++++++++++++++++++++++++++++
 
 - Made content-type mandatory only when content is expected
+
+Version 1.0 Release Candidate 4 (2015-02-18)
+++++++++++++++++++++++++++++++++++++++++++++
+
+- Made _HUBSPOT_ERROR_RESPONSE_SCHEMA allow extra keys
