@@ -39,6 +39,7 @@ class HubspotClientError(HubspotException):
             msg = error_message
         super(HubspotClientError, self).__init__(msg)
 
+        self.error_message = error_message
         self.request_id = request_id
         self.error_data = error_data
 

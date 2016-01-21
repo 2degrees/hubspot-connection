@@ -273,6 +273,7 @@ class TestErrorResponses(object):
         eq_(request_id, exception.request_id)
         eq_("Errors found processing batch update ([{u'index': 0, u'error': {u'status': u'error', u'message': u'Email address  is invalid'}}])",
             str(exception))
+        eq_(error_message, exception.error_message)
         eq_(invalid_emails, exception.error_data['invalidEmails'])
         eq_(failure_messages, exception.error_data['failureMessages'])
 
@@ -287,6 +288,7 @@ class TestErrorResponses(object):
 
         exception = HubspotClientError(error_message, request_id, error_data)
         eq_(error_message, str(exception))
+        eq_(error_message, exception.error_message)
 
 
 class TestAuthentication(object):
