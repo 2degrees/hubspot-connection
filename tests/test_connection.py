@@ -244,12 +244,25 @@ class TestErrorResponses(object):
 
     def test_client_error_response(self):
         request_id = get_uuid4_str()
-        error_message = 'Json node is missing child property'
+        error_message = 'Errors found processing batch update'
+        failure_messages = [
+            {
+                'index': 0,
+                'error': {
+                    'status': 'error',
+                    'message': 'Email address  is invalid'
+                }
+            }
+        ]
+        invalid_emails = ['']
         body_deserialization = {
             'status': 'error',
             'message': error_message,
-            'requestId': request_id,
-            }
+            'correlationId': '2ebc27ce-cc2d-4b81-99f3-01aa96e05206',
+            'invalidEmails': invalid_emails,
+            'failureMessages': failure_messages,
+            'requestId': request_id
+        }
         response_data_maker = _ResponseMaker(400, body_deserialization)
         connection = _MockPortalConnection(response_data_maker)
 
@@ -259,6 +272,8 @@ class TestErrorResponses(object):
         exception = context_manager.exception
         eq_(request_id, exception.request_id)
         eq_(error_message, str(exception))
+        eq_(invalid_emails, exception.error_data['invalidEmails'])
+        eq_(failure_messages, exception.error_data['failureMessages'])
 
 
 class TestAuthentication(object):

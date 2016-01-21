@@ -204,6 +204,7 @@ class PortalConnection(object):
             raise exception_class(
                 error_data['message'],
                 error_data['requestId'],
+                error_data,
                 )
         elif 500 <= response.status_code < 600:
             raise HubspotServerError(response.reason, response.status_code)

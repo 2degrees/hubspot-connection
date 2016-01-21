@@ -32,10 +32,11 @@ class HubspotClientError(HubspotException):
     :param unicode request_id:
 
     """
-    def __init__(self, msg, request_id):
+    def __init__(self, msg, request_id, error_data):
         super(HubspotClientError, self).__init__(msg)
 
         self.request_id = request_id
+        self.error_data = error_data
 
 
 class HubspotAuthenticationError(HubspotClientError):

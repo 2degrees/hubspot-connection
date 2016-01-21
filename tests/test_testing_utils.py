@@ -171,7 +171,7 @@ class TestMockPortalConnection(object):
 
     def test_unsuccessful_api_call(self):
         exception = \
-            HubspotAuthenticationError('Must authenticate', get_uuid4_str())
+            HubspotAuthenticationError('Must authenticate', get_uuid4_str(), {})
         expected_api_call = UnsuccessfulAPICall(
             _STUB_URL_PATH,
             'GET',
