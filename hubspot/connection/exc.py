@@ -33,6 +33,8 @@ class HubspotClientError(HubspotException):
 
     """
     def __init__(self, msg, request_id, error_data):
+        if error_data and 'failureMessages' in error_data:
+            msg = u'%s (%s)' % (msg, error_data['failureMessages'])
         super(HubspotClientError, self).__init__(msg)
 
         self.request_id = request_id

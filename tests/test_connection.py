@@ -271,9 +271,22 @@ class TestErrorResponses(object):
 
         exception = context_manager.exception
         eq_(request_id, exception.request_id)
-        eq_(error_message, str(exception))
+        eq_("Errors found processing batch update ([{u'index': 0, u'error': {u'status': u'error', u'message': u'Email address  is invalid'}}])",
+            str(exception))
         eq_(invalid_emails, exception.error_data['invalidEmails'])
         eq_(failure_messages, exception.error_data['failureMessages'])
+
+    def test_str_client_exception_when_no_failure_messages(self):
+        request_id = get_uuid4_str()
+        error_message = 'Json node is missing child property'
+        error_data = {
+            'status': 'error',
+            'message': error_message,
+            'requestId': request_id,
+        }
+
+        exception = HubspotClientError(error_message, request_id, error_data)
+        eq_(error_message, str(exception))
 
 
 class TestAuthentication(object):
