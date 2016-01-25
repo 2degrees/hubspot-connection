@@ -32,7 +32,7 @@ class HubspotClientError(HubspotException):
     :param unicode request_id:
 
     """
-    def __init__(self, error_message, request_id, error_data):
+    def __init__(self, error_message, request_id, error_data=None):
         if error_data and 'failureMessages' in error_data:
             msg = u'%s (%s)' % (error_message, error_data['failureMessages'])
         else:
