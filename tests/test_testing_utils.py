@@ -189,7 +189,7 @@ class TestMockPortalConnection(object):
     def test_too_few_requests(self):
         connection = \
             self._make_connection_for_expected_api_call(_STUB_API_CALL_1)
-        error_message = '1 more requests were expected'
+        error_message = '1 requests were expected, but only 0 calls were received'
         with assert_raises_substring(AssertionError, error_message):
             with connection:
                 # Do not make any requests in the connection
