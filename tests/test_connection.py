@@ -276,6 +276,7 @@ class TestErrorResponses(object):
         eq_(error_message, exception.error_message)
         eq_(invalid_emails, exception.error_data['invalidEmails'])
         eq_(failure_messages, exception.error_data['failureMessages'])
+        eq_(400, exception.http_status_code)
 
     def test_str_client_exception_when_no_failure_messages(self):
         request_id = get_uuid4_str()

@@ -31,15 +31,17 @@ class HubspotClientError(HubspotException):
 
     :param unicode request_id:
     :param dict optional error_data:
+    :param int optional http_status_code:
 
     """
-    def __init__(self, error_message, request_id, error_data=None):
+    def __init__(self, error_message, request_id, error_data=None, http_status_code=None):
         if error_data and 'failureMessages' in error_data:
             msg = u'%s (%s)' % (error_message, error_data['failureMessages'])
         else:
             msg = error_message
         super(HubspotClientError, self).__init__(msg)
 
+        self.http_status_code = http_status_code
         self.error_message = error_message
         self.request_id = request_id
         self.error_data = error_data
