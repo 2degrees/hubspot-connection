@@ -30,6 +30,7 @@ class HubspotClientError(HubspotException):
     of 40X, except 401
 
     :param unicode request_id:
+    :param dict optional error_data:
 
     """
     def __init__(self, error_message, request_id, error_data=None):
