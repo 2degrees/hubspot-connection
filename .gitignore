@@ -1,0 +1,9 @@
+.DS_Store
+*.pyc
+
+build
+!build/
+build/lib
+dist
+*.egg
+*.egg-info
