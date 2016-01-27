@@ -54,6 +54,7 @@ setup(
         'requests >= 2.2.1',
         'pyrecord >= 1.0a1',
         'voluptuous >= 0.8.4',
+        'six >= 1.10.0',
         ],
     test_suite='nose.collector',
     )
