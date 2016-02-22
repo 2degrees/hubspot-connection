@@ -13,16 +13,18 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from __future__ import unicode_literals
+from builtins import str as text
 
-from httplib import ACCEPTED as HTTP_STATUS_ACCEPTED
-from httplib import NO_CONTENT as HTTP_STATUS_NO_CONTENT
-from httplib import OK as HTTP_STATUS_OK
-from httplib import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
+from six.moves.http_client import ACCEPTED as HTTP_STATUS_ACCEPTED
+from six.moves.http_client import NO_CONTENT as HTTP_STATUS_NO_CONTENT
+from six.moves.http_client import OK as HTTP_STATUS_OK
+from six.moves.http_client import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
 from json import dumps as json_serialize
-from urllib import urlencode
-from urlparse import parse_qs
-from urlparse import urlsplit
-from urlparse import urlunsplit
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.parse import urlsplit
+from six.moves.urllib.parse import urlunsplit
 
 from pkg_resources import get_distribution
 from pyrecord import Record
@@ -46,8 +48,8 @@ _USER_AGENT = 'HubSpot Python Client/' + _DISTRIBUTION_VERSION
 _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
     {
         'status': Constant('error'),
-        'message': unicode,
-        'requestId': unicode,
+        'message': text,
+        'requestId': text,
         },
     required=True,
     extra=True,

@@ -13,7 +13,7 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-
+from builtins import str as text
 from copy import deepcopy
 
 from pyrecord import Record
@@ -174,7 +174,7 @@ def _assert_request_matches_api_call(
 
 def _convert_object_strings_to_unicode(object_):
     if isinstance(object_, str):
-        object_converted = unicode(object_)
+        object_converted = text(object_)
     elif isinstance(object_, (list, tuple)):
         object_converted = \
             [_convert_object_strings_to_unicode(value) for value in object_]

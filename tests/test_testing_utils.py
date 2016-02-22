@@ -19,6 +19,8 @@ from nose.tools import assert_is_instance
 from nose.tools import assert_raises
 from nose.tools import eq_
 
+from six import text_type
+
 from hubspot.connection.exc import HubspotAuthenticationError
 from hubspot.connection.testing import MockPortalConnection
 from hubspot.connection.testing import SuccessfulAPICall
@@ -279,9 +281,9 @@ class TestMockPortalConnection(object):
 
 
 def _assert_dict_keys_and_values_are_unicode(dict_):
-    values = dict_.keys() + dict_.values()
+    values = list(dict_.keys()) + list(dict_.values())
     for value in values:
-        assert_is_instance(value, unicode)
+        assert_is_instance(value, text_type)
 
 
 class _ConstantCallable(object):
