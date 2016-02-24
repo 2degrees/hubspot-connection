@@ -25,8 +25,8 @@ Here's an example of how it can be used:
     authentication_key = APIKey('HUBSPOT-API-KEY')
     with PortalConnection(authentication_key, 'client') as connection:
         contacts_data = connection.send_get_request('/contacts/v1/contacts/statistics')
-        print "Number of contacts: {}".format(contacts_data.get('contacts'))
+        print("Number of contacts: {}".format(contacts_data.get('contacts')))
 
 
-This project is officially supported under Python 2.7, but may work with
-Python 2.6 and Python 3.
+This project is officially supported under Python 2.7, may work with Python
+2.6, and has been confirmed to work under Python 3.4.
