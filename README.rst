@@ -28,5 +28,4 @@ Here's an example of how it can be used:
         print("Number of contacts: {}".format(contacts_data.get('contacts')))
 
 
-This project is officially supported under Python 2.7, may work with Python
-2.6, and has been confirmed to work under Python 3.4.
+This project is officially supported under Python 2.7 and Python 3.4, may work with Python 2.6.
