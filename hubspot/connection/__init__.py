@@ -230,11 +230,11 @@ class PortalConnection(object):
         self._session.close()
 
 
-_AuthenticationKey = Record.create_type('_AuthenticationKey', 'key_value')
+_AuthenticationKey = Record.create_type(str('_AuthenticationKey'), str('key_value'))
 
-OAuthKey = _AuthenticationKey.extend_type('OAuthKey')
+OAuthKey = _AuthenticationKey.extend_type(str('OAuthKey'))
 
-APIKey = _AuthenticationKey.extend_type('APIKey')
+APIKey = _AuthenticationKey.extend_type(str('APIKey'))
 
 
 class _QueryStringAuthenticationHandler(AuthBase):
