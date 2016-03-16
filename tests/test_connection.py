@@ -250,7 +250,7 @@ class TestErrorResponses(object):
                 'index': 0,
                 'error': {
                     'status': 'error',
-                    'message': 'Email address  is invalid'
+                    'message': 'Email address  is invalid',
                 }
             }
         ]
@@ -261,7 +261,7 @@ class TestErrorResponses(object):
             'correlationId': '2ebc27ce-cc2d-4b81-99f3-01aa96e05206',
             'invalidEmails': invalid_emails,
             'failureMessages': failure_messages,
-            'requestId': request_id
+            'requestId': request_id,
         }
         response_data_maker = _ResponseMaker(400, body_deserialization)
         connection = _MockPortalConnection(response_data_maker)
