@@ -281,7 +281,7 @@ class TestErrorResponses(object):
         eq_(failure_messages, exception.error_data['failureMessages'])
         eq_(400, exception.http_status_code)
 
-    def test_str_client_exception_when_no_failure_messages(self):
+    def test_str_client_exception_without_failure_messages(self):
         request_id = get_uuid4_str()
         error_message = 'Json node is missing child property'
         error_data = {
