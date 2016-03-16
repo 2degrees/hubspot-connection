@@ -29,7 +29,7 @@ from pyrecord import Record
 from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
 from requests.sessions import Session
-from voluptuous import Schema
+from voluptuous import Optional, Schema
 
 from hubspot.connection._validators import Constant
 from hubspot.connection.exc import HubspotAuthenticationError
@@ -48,6 +48,7 @@ _HUBSPOT_ERROR_RESPONSE_SCHEMA = Schema(
         'status': Constant('error'),
         'message': unicode,
         'requestId': unicode,
+        Optional('failureMessages'): list,
         },
     required=True,
     extra=True,
