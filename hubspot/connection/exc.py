@@ -58,8 +58,9 @@ class HubspotServerError(HubspotException):
     def __init__(self, msg, http_status_code):
         super(HubspotServerError, self).__init__(msg)
 
+        self.msg = msg
         self.http_status_code = http_status_code
 
     def __repr__(self):
-        return '{} {}'.format(self.http_status_code, self.message)
+        return '{} {}'.format(self.http_status_code, self.msg)
 
