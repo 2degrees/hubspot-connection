@@ -29,8 +29,8 @@ class HubspotClientError(HubspotException):
     HubSpot deemed the request invalid. This represents an HTTP response code
     of 40X, except 401
 
-    :param unicode request_id:
     :param unicode error_message: The error message returned by HubSpot
+    :param unicode request_id:
     :param dict optional error_data: The response data returned by HubSpot
     :param int optional http_status_code:
 
