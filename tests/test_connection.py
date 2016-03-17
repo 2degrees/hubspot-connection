@@ -14,9 +14,11 @@
 #
 ##############################################################################
 
+from builtins import bytes
+
 from json import dumps as json_serialize
-from urlparse import parse_qs
-from urlparse import urlparse
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.parse import urlparse
 
 from nose.tools import assert_dict_contains_subset
 from nose.tools import assert_equal
@@ -382,7 +384,7 @@ class _ResponseMaker(object):
             response.headers['Content-Type'] = content_type_header_value
 
         if self._status_code != 204 and self._body_deserialization is not None:
-            response._content = json_serialize(self._body_deserialization)
+            response._content = bytes(json_serialize(self._body_deserialization), 'UTF-8')
 
         return response
 

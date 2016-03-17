@@ -51,9 +51,14 @@ setup(
     packages=find_packages(exclude=['tests']),
     namespace_packages=['hubspot'],
     install_requires=[
-        'requests >= 2.2.1',
-        'pyrecord >= 1.0a1',
-        'voluptuous >= 0.8.4',
+        'requests >= 2.9.1',
+        'pyrecord >= 1.0.1',
+        'voluptuous >= 0.8.8',
+        'six >= 1.10.0',
+        'future >= 0.15.2',
         ],
     test_suite='nose.collector',
+    tests_require=[
+        'nose >= 1.3.7',
+        ],
     )
