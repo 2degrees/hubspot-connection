@@ -64,9 +64,8 @@ class MockPortalConnection(object):
             return
 
         expected_api_call_count = len(self._expected_api_calls)
-        pending_api_call_count = expected_api_call_count - self._request_count
         error_message = \
-            '{} more requests were expected'.format(pending_api_call_count)
+            '{} requests were expected, but only {} calls were received'.format(expected_api_call_count, self._request_count)
         assert expected_api_call_count == self._request_count, error_message
 
     def send_get_request(self, url_path, query_string_args=None):

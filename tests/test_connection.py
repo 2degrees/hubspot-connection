@@ -244,12 +244,25 @@ class TestErrorResponses(object):
 
     def test_client_error_response(self):
         request_id = get_uuid4_str()
-        error_message = 'Json node is missing child property'
+        error_message = 'Errors found processing batch update'
+        failure_messages = [
+            {
+                'index': 0,
+                'error': {
+                    'status': 'error',
+                    'message': 'Email address  is invalid',
+                }
+            }
+        ]
+        invalid_emails = ['']
         body_deserialization = {
             'status': 'error',
             'message': error_message,
+            'correlationId': '2ebc27ce-cc2d-4b81-99f3-01aa96e05206',
+            'invalidEmails': invalid_emails,
+            'failureMessages': failure_messages,
             'requestId': request_id,
-            }
+        }
         response_data_maker = _ResponseMaker(400, body_deserialization)
         connection = _MockPortalConnection(response_data_maker)
 
@@ -258,7 +271,28 @@ class TestErrorResponses(object):
 
         exception = context_manager.exception
         eq_(request_id, exception.request_id)
+        eq_("Errors found processing batch update "
+            "([{u'index': 0, u'error': "
+            "{u'status': u'error',"
+            " u'message': u'Email address  is invalid'}}])",
+            str(exception))
+        eq_(error_message, exception.error_message)
+        eq_(invalid_emails, exception.error_data['invalidEmails'])
+        eq_(failure_messages, exception.error_data['failureMessages'])
+        eq_(400, exception.http_status_code)
+
+    def test_str_client_exception_without_failure_messages(self):
+        request_id = get_uuid4_str()
+        error_message = 'Json node is missing child property'
+        error_data = {
+            'status': 'error',
+            'message': error_message,
+            'requestId': request_id,
+        }
+
+        exception = HubspotClientError(error_message, request_id, error_data)
         eq_(error_message, str(exception))
+        eq_(error_message, exception.error_message)
 
 
 class TestAuthentication(object):

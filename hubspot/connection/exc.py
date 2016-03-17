@@ -29,13 +29,23 @@ class HubspotClientError(HubspotException):
     HubSpot deemed the request invalid. This represents an HTTP response code
     of 40X, except 401
 
+    :param unicode error_message: The error message returned by HubSpot
     :param unicode request_id:
+    :param dict optional error_data: The response data returned by HubSpot
+    :param int optional http_status_code:
 
     """
-    def __init__(self, msg, request_id):
+    def __init__(self, error_message, request_id, error_data=None, http_status_code=None):
+        if error_data and 'failureMessages' in error_data:
+            msg = u'{0} ({1!s})'.format(error_message, error_data['failureMessages'])
+        else:
+            msg = error_message
         super(HubspotClientError, self).__init__(msg)
 
+        self.http_status_code = http_status_code
+        self.error_message = error_message
         self.request_id = request_id
+        self.error_data = error_data
 
 
 class HubspotAuthenticationError(HubspotClientError):
