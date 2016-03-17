@@ -60,9 +60,6 @@ class HubspotServerError(HubspotException):
 
         self.http_status_code = http_status_code
 
-    def __str__(self):
-        return repr(self)
-
     def __repr__(self):
         return '{} {}'.format(self.http_status_code, self.message)
 
