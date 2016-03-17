@@ -13,7 +13,6 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from __future__ import unicode_literals
 from builtins import str as text
 
 from six.moves.http_client import ACCEPTED as HTTP_STATUS_ACCEPTED
