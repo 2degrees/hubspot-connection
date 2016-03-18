@@ -6,6 +6,6 @@ python:
 install: pip install --use-mirrors .
 before_script:
   - pip install -r tests/requirements.txt --use-mirrors
-script: nosetests --with-coverage --cover-package hubspot.connection
+script: nosetests --with-coverage --cover-erase --cover-package hubspot.connection
 after_success:
   - coveralls
