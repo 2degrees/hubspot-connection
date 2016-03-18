@@ -17,3 +17,8 @@ Version 1.0 Release Candidate 4 (2015-02-18)
 ++++++++++++++++++++++++++++++++++++++++++++
 
 - Allowed for extra details in error responses from Hubspot
+
+Version 1.0 Release Candidate 5 (2016-03-18)
+++++++++++++++++++++++++++++++++++++++++++++
+
+- Added Python 3.4 and 3.5 compatibility by: @jtprince
