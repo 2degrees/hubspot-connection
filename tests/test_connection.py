@@ -13,10 +13,14 @@
 # INFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from abc import abstractmethod
+from abc import ABCMeta
 
 from builtins import bytes
 
 from json import dumps as json_serialize
+
+from six import with_metaclass
 from six.moves.urllib.parse import parse_qs
 from six.moves.urllib.parse import urlparse
 
@@ -36,6 +40,7 @@ from hubspot.connection import OAuthKey
 from hubspot.connection import PortalConnection
 from hubspot.connection.exc import HubspotAuthenticationError
 from hubspot.connection.exc import HubspotClientError
+from hubspot.connection.exc import HubspotCorruptedResponseError
 from hubspot.connection.exc import HubspotServerError
 from hubspot.connection.exc import HubspotUnsupportedResponseError
 
@@ -147,12 +152,27 @@ class TestPortalConnection(object):
 
         """
         expected_body_deserialization = {'foo': 'bar'}
-        response_data_maker = _ResponseMaker(200, expected_body_deserialization, 'application/json')
+        response_data_maker = _ResponseMaker(
+            200,
+            expected_body_deserialization,
+            'application/json',
+        )
         connection = _MockPortalConnection(response_data_maker)
 
         response_data = connection.send_get_request(_STUB_URL_PATH)
 
         eq_(expected_body_deserialization, response_data)
+
+    def test_corrupted_json_response(self):
+        """An exception is raised for responses containing malformed JSON."""
+        response_data_maker = _CorruptJSONResponseMaker(200)
+        connection = _MockPortalConnection(response_data_maker)
+
+        with assert_raises(HubspotCorruptedResponseError) as context_manager:
+            connection.send_get_request(_STUB_URL_PATH)
+
+        exception = context_manager.exception
+        eq_('Corrupt JSON in response body', str(exception))
 
     def test_unexpected_response_status_code(self):
         """
@@ -261,6 +281,17 @@ class TestErrorResponses(object):
         eq_(request_id, exception.request_id)
         eq_(error_message, str(exception))
 
+    def test_corrupted_json_response(self):
+        """An exception is raised for responses containing malformed JSON."""
+        response_data_maker = _CorruptJSONResponseMaker(400)
+        connection = _MockPortalConnection(response_data_maker)
+
+        with assert_raises(HubspotCorruptedResponseError) as context_manager:
+            connection.send_get_request(_STUB_URL_PATH)
+
+        exception = context_manager.exception
+        eq_('Corrupt JSON in response body', str(exception))
+
 
 class TestAuthentication(object):
 
@@ -319,7 +350,7 @@ class _MockPortalConnection(PortalConnection):
         change_source=None,
         *args,
         **kwargs
-        ):
+    ):
         super_class = super(_MockPortalConnection, self)
         super_class.__init__(authentication_key, change_source, *args, **kwargs)
 
@@ -358,25 +389,35 @@ class _MockRequestsAdapter(RequestsHTTPAdapter):
         return super(_MockRequestsAdapter, self).close(*args, **kwargs)
 
 
-class _ResponseMaker(object):
+class _BaseResponseMaker(with_metaclass(ABCMeta, object)):
+
+    def __init__(self, status_code):
+        super(_BaseResponseMaker, self).__init__()
+        self._status_code = status_code
+
+    @abstractmethod
+    def __call__(self, request):
+        response = RequestsResponse()
+        response.status_code = self._status_code
+        response.reason = 'Reason'
+        return response
+
+
+class _ResponseMaker(_BaseResponseMaker):
 
     def __init__(
         self,
         status_code,
         body_deserialization=None,
         content_type=None,
-        ):
-        super(_ResponseMaker, self).__init__()
+    ):
+        super(_ResponseMaker, self).__init__(status_code)
 
-        self._status_code = status_code
         self._body_deserialization = body_deserialization
         self._content_type = content_type
 
     def __call__(self, request):
-        response = RequestsResponse()
-
-        response.status_code = self._status_code
-        response.reason = 'Reason'
+        response = super(_ResponseMaker, self).__call__(request)
 
         if self._content_type:
             content_type_header_value = \
@@ -384,8 +425,18 @@ class _ResponseMaker(object):
             response.headers['Content-Type'] = content_type_header_value
 
         if self._status_code != 204 and self._body_deserialization is not None:
-            response._content = bytes(json_serialize(self._body_deserialization), 'UTF-8')
+            response._content = \
+                bytes(json_serialize(self._body_deserialization), 'UTF-8')
 
+        return response
+
+
+class _CorruptJSONResponseMaker(_BaseResponseMaker):
+
+    def __call__(self, request):
+        response = super(_CorruptJSONResponseMaker, self).__call__(request)
+        response.headers['Content-Type'] = 'application/json; charset=UTF-8'
+        response._content = bytes('{not json', 'UTF-8')
         return response
 
 

@@ -24,6 +24,10 @@ class HubspotUnsupportedResponseError(HubspotException):
     pass
 
 
+class HubspotCorruptedResponseError(HubspotException):
+    pass
+
+
 class HubspotClientError(HubspotException):
     """
     HubSpot deemed the request invalid. This represents an HTTP response code

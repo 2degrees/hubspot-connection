@@ -14,27 +14,27 @@
 #
 ##############################################################################
 from builtins import str as text
-
-from six.moves.http_client import ACCEPTED as HTTP_STATUS_ACCEPTED
-from six.moves.http_client import NO_CONTENT as HTTP_STATUS_NO_CONTENT
-from six.moves.http_client import OK as HTTP_STATUS_OK
-from six.moves.http_client import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
 from json import dumps as json_serialize
-from six.moves.urllib.parse import urlencode
-from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.parse import urlsplit
-from six.moves.urllib.parse import urlunsplit
 
 from pkg_resources import get_distribution
 from pyrecord import Record
 from requests.adapters import HTTPAdapter
 from requests.auth import AuthBase
 from requests.sessions import Session
+from six.moves.http_client import ACCEPTED as HTTP_STATUS_ACCEPTED
+from six.moves.http_client import NO_CONTENT as HTTP_STATUS_NO_CONTENT
+from six.moves.http_client import OK as HTTP_STATUS_OK
+from six.moves.http_client import UNAUTHORIZED as HTTP_STATUS_UNAUTHORIZED
+from six.moves.urllib.parse import parse_qs
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlsplit
+from six.moves.urllib.parse import urlunsplit
 from voluptuous import Schema
 
 from hubspot.connection._validators import Constant
 from hubspot.connection.exc import HubspotAuthenticationError
 from hubspot.connection.exc import HubspotClientError
+from hubspot.connection.exc import HubspotCorruptedResponseError
 from hubspot.connection.exc import HubspotServerError
 from hubspot.connection.exc import HubspotUnsupportedResponseError
 
@@ -182,7 +182,8 @@ class PortalConnection(object):
 
         if response.status_code == HTTP_STATUS_OK:
             cls._require_json_response(response)
-            response_body_deserialization = response.json() or None
+            response_body_deserialization = \
+                cls._deserialize_json_response(response)
         elif response.status_code in _HTTP_STATUS_CODES_WITH_EMPTY_BODIES:
             response_body_deserialization = None
         else:
@@ -192,10 +193,10 @@ class PortalConnection(object):
 
         return response_body_deserialization
 
-    @staticmethod
-    def _require_successful_response(response):
+    @classmethod
+    def _require_successful_response(cls, response):
         if 400 <= response.status_code < 500:
-            response_data = response.json()
+            response_data = cls._deserialize_json_response(response)
             error_data = _HUBSPOT_ERROR_RESPONSE_SCHEMA(response_data)
 
             if response.status_code == HTTP_STATUS_UNAUTHORIZED:
@@ -221,6 +222,16 @@ class PortalConnection(object):
             exception_message = \
                 'Unsupported response content type {}'.format(content_type)
             raise HubspotUnsupportedResponseError(exception_message)
+
+    @staticmethod
+    def _deserialize_json_response(response):
+        try:
+            response_body_deserialization = response.json() or None
+        except ValueError:
+            raise HubspotCorruptedResponseError(
+                'Corrupt JSON in response body',
+            )
+        return response_body_deserialization
 
     def __enter__(self):
         return self
