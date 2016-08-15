@@ -40,7 +40,7 @@ from hubspot.connection import OAuthKey
 from hubspot.connection import PortalConnection
 from hubspot.connection.exc import HubspotAuthenticationError
 from hubspot.connection.exc import HubspotClientError
-from hubspot.connection.exc import HubspotCorruptedResponseError
+from hubspot.connection.exc import HubspotInvalidResponseError
 from hubspot.connection.exc import HubspotServerError
 from hubspot.connection.exc import HubspotUnsupportedResponseError
 
@@ -168,11 +168,11 @@ class TestPortalConnection(object):
         response_data_maker = _CorruptJSONResponseMaker(200)
         connection = _MockPortalConnection(response_data_maker)
 
-        with assert_raises(HubspotCorruptedResponseError) as context_manager:
+        with assert_raises(HubspotInvalidResponseError) as context_manager:
             connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
-        eq_('Corrupt JSON in response body', str(exception))
+        eq_('Invalid JSON response body', str(exception))
 
     def test_unexpected_response_status_code(self):
         """
@@ -271,7 +271,8 @@ class TestErrorResponses(object):
             'message': error_message,
             'requestId': request_id,
             }
-        response_data_maker = _ResponseMaker(400, body_deserialization)
+        response_data_maker = \
+            _ResponseMaker(400, body_deserialization, 'application/json')
         connection = _MockPortalConnection(response_data_maker)
 
         with assert_raises(HubspotClientError) as context_manager:
@@ -286,11 +287,11 @@ class TestErrorResponses(object):
         response_data_maker = _CorruptJSONResponseMaker(400)
         connection = _MockPortalConnection(response_data_maker)
 
-        with assert_raises(HubspotCorruptedResponseError) as context_manager:
+        with assert_raises(HubspotInvalidResponseError) as context_manager:
             connection.send_get_request(_STUB_URL_PATH)
 
         exception = context_manager.exception
-        eq_('Corrupt JSON in response body', str(exception))
+        eq_('Invalid JSON response body', str(exception))
 
 
 class TestAuthentication(object):
@@ -326,6 +327,7 @@ class TestAuthentication(object):
                 'message': error_message,
                 'requestId': request_id,
                 },
+            content_type='application/json',
             )
         connection = _MockPortalConnection(
             response_data_maker,

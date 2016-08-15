@@ -34,7 +34,7 @@ from voluptuous import Schema
 from hubspot.connection._validators import Constant
 from hubspot.connection.exc import HubspotAuthenticationError
 from hubspot.connection.exc import HubspotClientError
-from hubspot.connection.exc import HubspotCorruptedResponseError
+from hubspot.connection.exc import HubspotInvalidResponseError
 from hubspot.connection.exc import HubspotServerError
 from hubspot.connection.exc import HubspotUnsupportedResponseError
 
@@ -196,6 +196,7 @@ class PortalConnection(object):
     @classmethod
     def _require_successful_response(cls, response):
         if 400 <= response.status_code < 500:
+            cls._require_json_response(response)
             response_data = cls._deserialize_json_response(response)
             error_data = _HUBSPOT_ERROR_RESPONSE_SCHEMA(response_data)
 
@@ -228,9 +229,7 @@ class PortalConnection(object):
         try:
             response_body_deserialization = response.json() or None
         except ValueError:
-            raise HubspotCorruptedResponseError(
-                'Corrupt JSON in response body',
-            )
+            raise HubspotInvalidResponseError()
         return response_body_deserialization
 
     def __enter__(self):

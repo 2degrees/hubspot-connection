@@ -24,8 +24,10 @@ class HubspotUnsupportedResponseError(HubspotException):
     pass
 
 
-class HubspotCorruptedResponseError(HubspotException):
-    pass
+class HubspotInvalidResponseError(HubspotException):
+
+    def __init__(self):
+        Exception.__init__(self, 'Invalid JSON response body')
 
 
 class HubspotClientError(HubspotException):
