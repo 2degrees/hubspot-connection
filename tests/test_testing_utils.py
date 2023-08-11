@@ -112,6 +112,25 @@ class TestMockPortalConnection(object):
         self._assert_sole_api_call_equals(expected_api_call, connection)
         eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
 
+    def test_patch_request(self):
+        request_body_deserialization = {'foo': 'bar'}
+        expected_api_call = SuccessfulAPICall(
+            _STUB_URL_PATH,
+            'PATCH',
+            request_body_deserialization=request_body_deserialization,
+            response_body_deserialization=_STUB_RESPONSE_BODY_DESERIALIZATION,
+            )
+        connection = \
+            self._make_connection_for_expected_api_call(expected_api_call)
+
+        response_body_deserialization = connection.send_patch_request(
+            _STUB_URL_PATH,
+            request_body_deserialization,
+            )
+
+        self._assert_sole_api_call_equals(expected_api_call, connection)
+        eq_(_STUB_RESPONSE_BODY_DESERIALIZATION, response_body_deserialization)
+
     def test_delete_request(self):
         expected_api_call = SuccessfulAPICall(
             _STUB_URL_PATH,
