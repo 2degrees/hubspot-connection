@@ -63,6 +63,9 @@ class TestPortalConnection(object):
     def test_put_request(self):
         self._check_request_sender('PUT', 'send_put_request', True)
 
+    def test_patch_request(self):
+        self._check_request_sender('PUT', 'send_patch_request', True)
+
     def test_delete_request(self):
         self._check_request_sender('DELETE', 'send_delete_request', False)
 

@@ -86,6 +86,13 @@ class MockPortalConnection(object):
             request_body_deserialization=body_deserialization,
             )
 
+    def send_patch_request(self, url_path, body_deserialization):
+        return self._call_remote_method(
+            url_path,
+            'PATCH',
+            request_body_deserialization=body_deserialization,
+            )
+
     def send_delete_request(self, url_path):
         return self._call_remote_method(url_path, 'DELETE')
 

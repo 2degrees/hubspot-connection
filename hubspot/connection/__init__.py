@@ -132,6 +132,22 @@ class PortalConnection(object):
             body_deserialization=body_deserialization,
             )
 
+    def send_patch_request(self, url_path, body_deserialization):
+        """
+        Send a PATCH request to HubSpot
+
+        :param basestring url_path: The URL path to the endpoint
+        :param body_deserialization: The request's body message deserialized
+
+        :return: Decoded version of the ``JSON`` that HubSpot put in \
+                the body of the response.
+        """
+        return self._send_request(
+            'PATCH',
+            url_path,
+            body_deserialization=body_deserialization,
+            )
+
     def send_delete_request(self, url_path):
         """
         Send a DELETE request to HubSpot
